@@ -18,6 +18,9 @@ import json
 
 # If modifying these scopes, delete the file token.pickle.
 SCOPES = ['https://www.googleapis.com/auth/calendar.readonly']
+MONTHS = ["january", "february", "march", "april", "may", "june","july", "august", "september","october", "november", "december"]
+DAYS = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
+DAY_EXTENTIONS = ["rd", "th", "st", "nd"]
 
 
 def speak(text):
@@ -27,6 +30,7 @@ def speak(text):
     playsound.playsound(fname)
 
 def get_audio():
+    print("Ready to listen...")
     r = sr.Recognizer()
     with sr.Microphone() as source:
         audio = r.listen(source)
@@ -111,10 +115,57 @@ def get_events(n, service):
         print(start, event['summary'])
 
 
+def get_date(text):
+    text = text.lower()
+    today = datetime.date.today()
 
+    if text.count("today") > 0:
+        return today
 
-service = authenticate_google()
-get_events(2, service)
+    day = -1
+    day_of_week = -1
+    month = -1
+    year = today.year
+
+    for word in text.split():
+        if word in MONTHS:
+            month = MONTHS.index(word) + 1
+        elif word in DAYS:
+            day_of_week = DAYS.index(word)
+        elif word.isdigit():
+            day = int(word)
+        else:
+            for ext in DAY_EXTENTIONS:
+                found = word.find(ext)
+                if found > 0:
+                    try:
+                        day = int(word[:found])
+                    except:
+                        pass
+
+    if month < today.month and month != -1:
+        year += 1
+    
+    if day < today.day and month == -1 and day != -1:
+        month += 1
+
+    if month == -1 and day == -1 and day_of_week != -1:
+        current_day_of_week = today.weekday()
+        dif = day_of_week - current_day_of_week
+
+        if dif < 0:
+            dif += 7
+            if text.count("next") > 0:
+                dif += 7 
+        
+        return today + datetime.timedelta(dif)
+
+    return datetime.date(month=month, day=day, year=year)
+
+# service = authenticate_google()
+# get_events(2, service) 
 
 # if __name__ == '__main__':
-#     main()
+
+text = get_audio().lower()
+print(F"This nigga really just said {get_date(text)}, LMFAOOOO") 
