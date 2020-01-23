@@ -12,6 +12,7 @@ import time
 import pyttsx3
 import speech_recognition as sr
 import pytz
+import subprocess
 
 import wmi # control brightness
 import json
@@ -182,26 +183,38 @@ def get_date(text):
 
     return datetime.date(month=month, day=day, year=year)
 
-# service = authenticate_google()
-# get_events(2, service) 
+def note(text):
+    date = datetime.datetime.now()
+    file_name = str(date).replace(":", "-") + "-note.txt"
+    with open(file_name, "w") as f:
+        f.write(text)
 
-# if __name__ == '__main__':
+    vsc = "C:/Users/Cakee/AppData/Local/Programs/Microsoft VS Code/Code.exe"
+    notepad = "C:/WINDOWS/system32/notepad.exe"
+    subprocess.Popen([notepad, file_name])
 
-
-
-# text = get_audio().lower()
-# print(F"This nigga really just said {get_date(text)}, LMFAOOOO") 
 
 service = authenticate_google()
-text = get_audio()
+text = get_audio().lower()
 
 CALENDAR_STRS = ["today", "plan", "planned", "plans",
                     "am i busy", "what do i have"]
 for phrase in CALENDAR_STRS:
-    if phrase in text.lower():
+    if phrase in text:
         date = get_date(text)
         if date:
             get_events(get_date(text), service)
         else:
             speak("Please try again.")
         break
+
+NOTE_STRS = ["make a note", "write this down", "remind me", "listen to me"]
+for phrase in NOTE_STRS:
+    if phrase in text:
+        speak("What would you like me to write down?")
+        txt = get_audio().lower()
+        note(txt)
+        speak("I have just made a note.")
+        break
+
+# if __name__ == '__main__':
