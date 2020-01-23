@@ -42,7 +42,7 @@ def get_audio():
         except Exception as e:
             print("Exception" + str(e))
             
-    return said
+    return said.lower()
 
 def run(here):
     if here < 5:
@@ -61,10 +61,6 @@ def run(here):
 # if "your name" in text:
 #     speak("My name is Pixel.")
 
-# if "change brightness" in text or "lower brightness" in text:
-#     num = [i for i in list(text) if i.isdigit()]
-#     brightness = int("".join(num))
-#     wmi.WMI(namespace='wmi').WmiMonitorBrightnessMethods()[0].WmiSetBrightness(brightness, 0)
 
 # if "hi to my" in text:
 #     target = text.split(" ")
@@ -127,14 +123,13 @@ def get_events(day, service):
             if int(start_time.split(":")[0]) < 12:
                 start_time = start_time + "AM"
             else:
-                start_time = str(int(start_time.split(":")[0]) - 12) + str(start_time.split(":")[1])
+                start_time = str(int(start_time.split(":")[0]) - 12) + start_time.split(":")[1]
                 start_time = start_time + "PM"
 
             speak(event["summary"] + " at " + start_time)
 
 
 def get_date(text):
-    text = text.lower()
     today = datetime.date.today()
 
     if text.count("today") > 0:
@@ -193,28 +188,39 @@ def note(text):
     notepad = "C:/WINDOWS/system32/notepad.exe"
     subprocess.Popen([notepad, file_name])
 
+WAKE = "bixby"
+SERVICE = authenticate_google()
 
-service = authenticate_google()
-text = get_audio().lower()
+while True:
+    text = get_audio()
+    if text.count(WAKE) > 0:
+        speak("Yes")
+        text = get_audio()
 
-CALENDAR_STRS = ["today", "plan", "planned", "plans",
-                    "am i busy", "what do i have"]
-for phrase in CALENDAR_STRS:
-    if phrase in text:
-        date = get_date(text)
-        if date:
-            get_events(get_date(text), service)
-        else:
-            speak("Please try again.")
-        break
+        CALENDAR_STRS = ["today", "plan", "planned", "plans",
+                            "am i busy", "what do i have"]
+        for phrase in CALENDAR_STRS:
+            if phrase in text:
+                date = get_date(text)
+                if date:
+                    get_events(get_date(text), SERVICE)
+                else:
+                    speak("I don't understand.")
+                break
 
-NOTE_STRS = ["make a note", "write this down", "remind me", "listen to me"]
-for phrase in NOTE_STRS:
-    if phrase in text:
-        speak("What would you like me to write down?")
-        txt = get_audio().lower()
-        note(txt)
-        speak("I have just made a note.")
-        break
+        NOTE_STRS = ["make a note", "write this down", "remind me", "listen to me"]
+        for phrase in NOTE_STRS:
+            if phrase in text:
+                speak("What would you like me to write down?")
+                txt = get_audio()
+                note(txt)
+                speak("I have just made a note.")
+                break
+
+        if "change brightness" in text or "lower brightness" in text:
+            num = [i for i in list(text) if i.isdigit()]
+            brightness = int("".join(num))
+            wmi.WMI(namespace='wmi').WmiMonitorBrightnessMethods()[0].WmiSetBrightness(brightness, 0)
+
 
 # if __name__ == '__main__':
