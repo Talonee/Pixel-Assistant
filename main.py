@@ -26,13 +26,16 @@ DAY_EXTENTIONS = ["rd", "th", "st", "nd"]
 
 def speak(text):
     engine = pyttsx3.init()
+    engine.setProperty('voice', "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Speech\Voices\Tokens\TTS_MS_EN-US_ZIRA_11.0")
+    engine.setProperty('rate', 175)
     engine.say(text)
     engine.runAndWait()
+
 
 def get_audio():
     print("Ready to listen...")
     r = sr.Recognizer()
-    with sr.Microphone() as source:
+    with sr.Microphone(1) as source:
         audio = r.listen(source)
         said = ""
 
@@ -44,12 +47,6 @@ def get_audio():
             
     return said.lower()
 
-def run(here):
-    if here < 5:
-        speak("I'm a boat")
-        return "Still going"
-    else:
-        return "I'm done"
 
 # speak("Hello, what would you like me to do?")
 # get_audio()
@@ -61,13 +58,11 @@ def run(here):
 # if "your name" in text:
 #     speak("My name is Pixel.")
 
-
 # if "hi to my" in text:
 #     target = text.split(" ")
 #     speak(f"Hello, Talon's {target[-1]}")
 
-# if "go to sleep" in text:
-#     os.system("rundll32.exe powrprof.dll,SetSuspendState 0,1,0")
+
 
 
 # if __name__ == "__main__":
@@ -178,6 +173,13 @@ def get_date(text):
 
     return datetime.date(month=month, day=day, year=year)
 
+def set_master_volume(volume):
+    val = float(int(volume))
+
+    proc = subprocess.Popen('/usr/bin/amixer sset Master ' + str(val) + '%', shell=True, stdout=subprocess.PIPE)
+    proc.wait()
+
+
 def note(text):
     date = datetime.datetime.now()
     file_name = str(date).replace(":", "-") + "-note.txt"
@@ -188,7 +190,7 @@ def note(text):
     notepad = "C:/WINDOWS/system32/notepad.exe"
     subprocess.Popen([notepad, file_name])
 
-WAKE = "bixby"
+WAKE = "sarah"
 SERVICE = authenticate_google()
 
 while True:
@@ -221,6 +223,22 @@ while True:
             num = [i for i in list(text) if i.isdigit()]
             brightness = int("".join(num))
             wmi.WMI(namespace='wmi').WmiMonitorBrightnessMethods()[0].WmiSetBrightness(brightness, 0)
+
+        if "go to sleep" in text:
+            os.system("rundll32.exe powrprof.dll,SetSuspendState 0,1,0")
+
+        VOLUME = ["change volume", "lower volume", "increase volume"]
+        for phrase in VOLUME:
+            if phrase in text:
+                speak("Changing volume")
+                for word in text:
+                    if word.isdigit():
+                        print(f"Volume {word}")
+                        set_master_volume(int(word))
+                        break
+                break
+
+
 
 
 # if __name__ == '__main__':
