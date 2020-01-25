@@ -173,12 +173,10 @@ def get_date(text):
 
     return datetime.date(month=month, day=day, year=year)
 
-def set_master_volume(volume):
-    val = float(int(volume))
+# def set_master_volume(vol):
+#     pass
 
-    proc = subprocess.Popen('/usr/bin/amixer sset Master ' + str(val) + '%', shell=True, stdout=subprocess.PIPE)
-    proc.wait()
-
+# set_master_volume(40)
 
 def note(text):
     date = datetime.datetime.now()
@@ -190,6 +188,7 @@ def note(text):
     notepad = "C:/WINDOWS/system32/notepad.exe"
     subprocess.Popen([notepad, file_name])
 
+'''
 WAKE = "sarah"
 SERVICE = authenticate_google()
 
@@ -220,24 +219,27 @@ while True:
                 break
 
         if "change brightness" in text or "lower brightness" in text:
-            num = [i for i in list(text) if i.isdigit()]
-            brightness = int("".join(num))
-            wmi.WMI(namespace='wmi').WmiMonitorBrightnessMethods()[0].WmiSetBrightness(brightness, 0)
+            # Run system.screen.setBrightness()
+            # num = [i for i in list(text) if i.isdigit()]
+            # brightness = int("".join(num))
+            # wmi.WMI(namespace='wmi').WmiMonitorBrightnessMethods()[0].WmiSetBrightness(brightness, 0)
 
         if "go to sleep" in text:
-            os.system("rundll32.exe powrprof.dll,SetSuspendState 0,1,0")
+            # Run system.window.sleep()
+            # os.system("rundll32.exe powrprof.dll,SetSuspendState 0,1,0")
 
         VOLUME = ["change volume", "lower volume", "increase volume"]
         for phrase in VOLUME:
             if phrase in text:
-                speak("Changing volume")
-                for word in text:
-                    if word.isdigit():
-                        print(f"Volume {word}")
-                        set_master_volume(int(word))
-                        break
-                break
-
+                # Run system.audio.setVolume()
+                # speak("Changing volume")
+                # for word in text:
+                #     if word.isdigit():
+                #         print(f"Volume {word}")
+                #         set_master_volume(int(word))
+                #         break
+                # break
+'''
 
 
 
