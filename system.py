@@ -1,14 +1,10 @@
-
+# Audio 
 from ctypes import cast, POINTER
 from comtypes import CLSCTX_ALL
 from pycaw.pycaw import AudioUtilities, IAudioEndpointVolume
-import os
-import wmi
 
-
-# pass speak and getaudio into this somehow
-
-
+import os # Window
+import wmi # Screen
 
 class Audio():
     def __init__(self):
@@ -38,77 +34,25 @@ class Audio():
             IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
         self.volume = cast(interface, POINTER(IAudioEndpointVolume))
 
-    # Set volume to a specified level
-    def setVolume(self, level):
+    def setVolume(self, pre="to", level="10"):
         # Remove % and set level to between 0 and 1
         level = (int(level.replace("%", "")) if "%" in level else int(level)) / 100
+
+        if pre == "by":
+            level = self._getVolume() + level
+        else:
+            level = abs(level)
         
         # Cap volume level if exceed 100% or below 0%
         level = 1 if level > 1 else 0 if level < 0 else level 
 
         self.volume.SetMasterVolumeLevelScalar(level, None)
 
-    # Get current volume level
     def getVolume(self):
+        return f"{(self.volume.GetMasterVolumeLevelScalar() * 100):.0f}%"
+
+    def _getVolume(self):
         return self.volume.GetMasterVolumeLevelScalar()
-    
-    # Increase volume by/to a specified level
-    def increaseVolume(self, pre="by", level="10"):
-        # Remove % and set increment to between 0 and 1
-        level = (int(level.replace("%", "")) if "%" in level else int(level)) / 100
-        curr = round(self.getVolume(), 2)
-
-        if pre == "by":
-            level = curr + level
-        elif pre == "to":
-            level = abs(level)
-
-        level = 0 if level < 0 else 1 if level > 1 else level
-
-        self.volume.SetMasterVolumeLevelScalar(level, None)
-
-    # Decrease volume by/to a specified level
-    def decreaseVolume(self, pre="by", level="10"):
-        # Remove % and set increment to between 0 and 1
-        level = (int(level.replace("%", "")) if "%" in level else int(level)) / 100
-        curr = round(self.getVolume(), 2)
-
-        if pre == "by":
-            level = curr - level
-        elif pre == "to":
-            level = abs(level)
-
-        level = 0 if level < 0 else 1 if level > 1 else level
-
-        self.volume.SetMasterVolumeLevelScalar(level, None)
-
-class Window():
-    def __init__(self):
-        pass
-
-    def sleep():
-        speak("Do you wish to sleep?") 
-        sleep = getaudio()
-        if sleep == 'no': 
-            exit() 
-        else: 
-            os.system("rundll32.exe powrprof.dll,SetSuspendState 0,1,0")
-
-    def shutdown(self):
-        speak("Do you wish to shutdown your computer?") 
-        shutdown = getaudio()
-        if shutdown == 'no': 
-            exit() 
-        else: 
-            os.system("shutdown /s /t 1") 
-
-    def restart(self):
-        speak("Do you wish to restart your computer?") 
-        restart = getaudio()
-        if restart == 'no': 
-            exit() 
-        else: 
-            os.system("shutdown /r /t 1") 
 
 class Screen():
     def __init__(self):
@@ -134,16 +78,26 @@ class Screen():
     def _getBrightness(self):
         return self.monitor.WmiMonitorBrightness()[0].CurrentBrightness
 
-# combine set, incraese, and decrease
+class Window():
+    def __init__(self):
+        pass
+
+    def sleep():
+        os.system("rundll32.exe powrprof.dll,SetSuspendState 0,1,0")
+
+    def restart(self):
+        os.system("shutdown /r /t 1")
+
+    def shutdown(self):
+        os.system("shutdown /s /t 1") 
+ 
 
 
 
 audio = Audio()
+# audio.setVolume(pre="by", level="-9%")
+# print(audio.getVolume())
 
 screen = Screen()
-screen.setBrightness(pre="by", level="-91%")
-print(screen.getBrightness())
-print(screen._getBrightness())
-# a = wmi.WMI(namespace='wmi').WmiMonitorBrightnessMethods()[0].WmiSetBrightness(50, 0)
-# curr = wmi.WMI(namespace='wmi')
-# print(curr)
+# screen.setBrightness(pre="by", level="-91%")
+# print(screen.getBrightness())

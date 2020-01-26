@@ -14,8 +14,10 @@ import speech_recognition as sr
 import pytz
 import subprocess
 
-import wmi # control brightness
 import json
+
+
+import system
 
 # If modifying these scopes, delete the file token.pickle.
 SCOPES = ['https://www.googleapis.com/auth/calendar.readonly']
@@ -192,7 +194,10 @@ def note(text):
 WAKE = "serena"
 SERVICE = authenticate_google()
 
-while True:
+
+
+listen = True
+while listen:
     print("Initiate...")
     text = get_audio()
     if text.count(WAKE) > 0:
@@ -225,10 +230,31 @@ while True:
             # brightness = int("".join(num))
             # wmi.WMI(namespace='wmi').WmiMonitorBrightnessMethods()[0].WmiSetBrightness(brightness, 0)
             pass
-        if "go to sleep" in text:
-            pass
-            # Run system.window.sleep()
-            # os.system("rundll32.exe powrprof.dll,SetSuspendState 0,1,0")
+
+
+        COM_STATUS = ["sleep", "restart", "turn off", "shut down"]
+        for phrase in COM_STATUS:
+            if phrase in text:
+                if "set to" in text:
+                    response = "y"
+                else:
+                    speak(f"Do you want to {phrase}?")
+                    response = get_audio()
+
+                if response[0] == "y":
+                    if "sleep" in phrase:
+                        print("Attempting to sleep...")
+                        system.Window.sleep()
+                    elif "restart" in phrase:    
+                        print("Attempting to restart...")
+                        system.Window.restart()
+                    elif "shut down" in phrase or "turn off" in phrase:
+                        print("Attempting to shut down...")
+                        system.Window.shutdown()
+
+                    listen = False
+                break
+        
 
         VOLUME = ["change volume", "lower volume", "increase volume"]
         for phrase in VOLUME:
