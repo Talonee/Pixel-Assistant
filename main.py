@@ -35,7 +35,7 @@ def speak(text):
 
 
 def get_audio():
-    print("Ready to listen...")
+    # print("Ready to listen...")
     r = sr.Recognizer()
     with sr.Microphone(1) as source:
         audio = r.listen(source)
@@ -46,6 +46,9 @@ def get_audio():
             print(said)
         except Exception as e:
             print("Exception" + str(e))
+    
+    # speak("Yes")
+    print("Ready to listen...")
             
     return said.lower()
 
@@ -198,10 +201,9 @@ SERVICE = authenticate_google()
 
 listen = True
 while listen:
-    print("Initiate...")
+    print("Initiate... Listening")
     text = get_audio()
     if text.count(WAKE) > 0:
-        speak("Yes")
         text = get_audio()
 
         CALENDAR_STRS = ["today", "plan", "planned", "plans",
@@ -244,13 +246,13 @@ while listen:
                 if response[0] == "y":
                     if "sleep" in phrase:
                         print("Attempting to sleep...")
-                        system.Window.sleep()
+                        system.Window().sleep()
                     elif "restart" in phrase:    
                         print("Attempting to restart...")
-                        system.Window.restart()
+                        system.Window().restart()
                     elif "shut down" in phrase or "turn off" in phrase:
                         print("Attempting to shut down...")
-                        system.Window.shutdown()
+                        system.Window().shutdown()
 
                     listen = False
                 break
