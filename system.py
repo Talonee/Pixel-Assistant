@@ -2,17 +2,8 @@
 from ctypes import cast, POINTER
 from comtypes import CLSCTX_ALL
 from pycaw.pycaw import AudioUtilities, IAudioEndpointVolume
-
-import numpy as np 
-from scipy.optimize import curve_fit   
-from matplotlib import pyplot as plt
-
-import numpy
-from sympy import S, symbols, printing
-import matplotlib.pyplot as plt
-import time
 import os
-
+import wmi
 
 
 # pass speak and getaudio into this somehow
@@ -59,7 +50,7 @@ class Audio():
 
     # Get current volume level
     def getVolume(self):
-        return f"{self.volume.GetMasterVolumeLevelScalar() * 100:.0f}" + "%"
+        return self.volume.GetMasterVolumeLevelScalar()
     
     # Increase volume by/to a specified level
     def increaseVolume(self, pre="by", level="10"):
@@ -121,109 +112,38 @@ class Window():
 
 class Screen():
     def __init__(self):
-        pass
+        self.monitor = wmi.WMI(namespace='wmi')
 
-    def setBrightness(self, level):
-            # num = [i for i in list(text) if i.isdigit()]
-            # brightness = int("".join(num))
-            # wmi.WMI(namespace='wmi').WmiMonitorBrightnessMethods()[0].WmiSetBrightness(brightness, 0)
-            wmi.WMI(namespace='wmi').WmiMonitorBrightnessMethods()[0].WmiSetBrightness(level, 0)
+    def setBrightness(self, pre="to", level="10"):
+        # num = [i for i in list(text) if i.isdigit()]
+        # brightness = int("".join(num))
+        level = (int(level.replace("%", "")) if "%" in level else int(level))
+        
+        if pre == "by":
+            level = self._getBrightness() + level
+        else:
+            level = abs(level)
+        
+        level = 0 if level < 0 else 100 if level > 100 else level
 
+        self.monitor.WmiMonitorBrightnessMethods()[0].WmiSetBrightness(level, 0)
 
+    def getBrightness(self):
+        return f"{(self.monitor.WmiMonitorBrightness()[0].CurrentBrightness):.0f}%"
+
+    def _getBrightness(self):
+        return self.monitor.WmiMonitorBrightness()[0].CurrentBrightness
+
+# combine set, incraese, and decrease
 
 
 
 audio = Audio()
-print(audio.getVolume())
-# stacked_x = numpy.array([x,x+1,x-1])
-# coeffs = mpf(stacked_x, y, deg) 
 
-
-# plt.plot(x_first, y_first, 'o')
-# coeffs = numpy.polyfit(x_first,y_first,1)
-# x2 = numpy.arange(min(x_first)-1, max(x_first)+1, 0.01) #use more points for a smoother plot
-# y2 = numpy.polyval(coeffs, x2) #Evaluates the polynomial for each x2 value
-# plt.plot(x2, y2, label="deg=3")
-# plt.legend()
-# plt.show()
-
-# print(coeffs)
-# x = symbols("x")
-# poly = sum(S("{:6.2f}".format(v))*x**i for i, v in enumerate(coeffs[::-1]))
-# eq_latex = printing.latex(poly)
-# print(eq_latex)
-
-
-
-# a = coeffs[0]
-# b = coeffs[1]
-# c = coeffs[2]
-# d = coeffs[3]
-# e = coeffs[4]
-# f = coeffs[5]
-# model = lambda x: a*(x**5) + b*(x**4) + c*(x**3) + d*(x**2) + e*x+f
-
-# def polynomial(coeffs, index, degree):
-#     if degree == 0:
-#         return str(coeffs[index])
-#     # return str(coeffs[index], **degree + polynomial(coeffs, index + 1, degree - 1)
-#     return f"{coeffs[index]:.2f}x^{degree} " + polynomial(coeffs, index + 1, degree - 1)
-# print(coeffs)
-# print(polynomial(coeffs, 0, 5))
-
-# for i in np.arange(0, 1.05, 0.05):
-# for i in np.arange(0, 1.05, 0.05):
-#     print(f"{(i * 100):.0f}% has a value of {model(i):.2f}")
-#     volume.SetMasterVolumeLevel(model(i), None)
-#     time.sleep(1)
-
-
-# print(volume.GetMute())
-# volume.GetMasterVolumeLevel()
-# print(volume.GetMasterVolumeLevel())
-# print(volume.GetVolumeRange())
-# # volume.SetMasterVolumeLevel(-20.0, None)
-# for i in range(1, 20):
-#     print(volume.GetMasterVolumeLevel())
-#     volume.SetMasterVolumeLevel(-0.8*i, None)
-#     time.sleep(1)
-    # volume.SetMasterVolumeLevel(-1.6, None)
-    # time.sleep(2)
-    # volume.SetMasterVolumeLevel(-2.4, None)
-    # time.sleep(2)
-
-
-
-
-
-
-
-
-
-
-
-
-# VOL = -0.7781546711921692
-# for i in range(1,8):
-#     print(f"Iteration {i}: {i * VOL}")
-# minVolume = volume.GetVolumeRange()[0]
-# maxVolume = volume.GetVolumeRange()[1]
-# incVolume = volume.GetVolumeRange()[2]
-# n = (maxVolume - minVolume) / incVolume
-# print(minVolume, maxVolume, n)
-# for i in range(int(n)):
-#     print(f"Vol: {minVolume + i * incVolume}")
-#     volume.SetMasterVolumeLevel(minVolume + i * incVolume, None)
-#     time.sleep(0.1)
-
-# volume.SetMasterVolumeLevel(-60, None)
-# print(volume.GetMasterVolumeLevel())
-
-# volRange = minVolume - maxVolume 
-
-# def setVolume(perc):
-#     vol = minVolume - volRange * perc / 100 
-#     print(vol)
-#     volume.SetMasterVolumeLevel(vol, None)
-
-# setVolume(20)
+screen = Screen()
+screen.setBrightness(pre="by", level="-91%")
+print(screen.getBrightness())
+print(screen._getBrightness())
+# a = wmi.WMI(namespace='wmi').WmiMonitorBrightnessMethods()[0].WmiSetBrightness(50, 0)
+# curr = wmi.WMI(namespace='wmi')
+# print(curr)
