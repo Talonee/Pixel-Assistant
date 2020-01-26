@@ -188,11 +188,12 @@ def note(text):
     notepad = "C:/WINDOWS/system32/notepad.exe"
     subprocess.Popen([notepad, file_name])
 
-'''
-WAKE = "sarah"
+
+WAKE = "serena"
 SERVICE = authenticate_google()
 
 while True:
+    print("Initiate...")
     text = get_audio()
     if text.count(WAKE) > 0:
         speak("Yes")
@@ -223,14 +224,16 @@ while True:
             # num = [i for i in list(text) if i.isdigit()]
             # brightness = int("".join(num))
             # wmi.WMI(namespace='wmi').WmiMonitorBrightnessMethods()[0].WmiSetBrightness(brightness, 0)
-
+            pass
         if "go to sleep" in text:
+            pass
             # Run system.window.sleep()
             # os.system("rundll32.exe powrprof.dll,SetSuspendState 0,1,0")
 
         VOLUME = ["change volume", "lower volume", "increase volume"]
         for phrase in VOLUME:
             if phrase in text:
+                pass
                 # Run system.audio.setVolume()
                 # speak("Changing volume")
                 # for word in text:
@@ -239,7 +242,6 @@ while True:
                 #         set_master_volume(int(word))
                 #         break
                 # break
-'''
 
 
 
