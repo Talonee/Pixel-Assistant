@@ -8,6 +8,7 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 
 import os
+import sys
 import time
 import pyttsx3
 import speech_recognition as sr
@@ -194,10 +195,55 @@ def note(text):
     subprocess.Popen([notepad, file_name])
 
 
+
+
+
+
+
+def computer(text):
+    if "set to" in text:
+        response = "y"
+    else:
+        speak(f"Do you want to {phrase}?")
+        response = get_audio()
+
+    if response[0] == "y":
+        if "sleep" in phrase:
+            print("Attempting to sleep...")
+            system.Window().sleep()
+        elif "restart" in phrase:    
+            print("Attempting to restart...")
+            system.Window().restart()
+        elif "shut down" in phrase or "turn off" in phrase:
+            print("Attempting to shut down...")
+            system.Window().shutdown()
+
+        listen = False
+
+def volume(text):
+    if "get" in text:
+        sys.tracebacklimit = -1
+        speak("The current volume is " + system.Audio().getVolume())
+    elif "mute" in text or "unmute" in text:
+        system.Audio().toggleMute("unmute") if "unmute" in text else system.Audio().toggleMute("mute")
+    else:
+        text = text.replace("%", "").replace("the", "") # remove misc
+        level = [i for i in text.split() if i.isdigit()][0] # extract volume level
+        level = ("-" + level) if "lower" in text else level # switch signs
+        
+        if "by" in text:
+            system.Audio().setVolume(pre="by",level=level)
+        else:
+            system.Audio().setVolume(pre="to",level=level)
+
+
+
+
+
+
+'''
 WAKE = "serena"
 SERVICE = authenticate_google()
-
-
 
 listen = True
 while listen:
@@ -234,43 +280,22 @@ while listen:
             pass
 
 
-        COM_STATUS = ["sleep", "restart", "turn off", "shut down"]
-        for phrase in COM_STATUS:
+        COMPUTER = ["sleep", "restart", "turn off", "shut down"]
+        for phrase in COMPUTER:
             if phrase in text:
-                if "set to" in text:
-                    response = "y"
-                else:
-                    speak(f"Do you want to {phrase}?")
-                    response = get_audio()
-
-                if response[0] == "y":
-                    if "sleep" in phrase:
-                        print("Attempting to sleep...")
-                        system.Window().sleep()
-                    elif "restart" in phrase:    
-                        print("Attempting to restart...")
-                        system.Window().restart()
-                    elif "shut down" in phrase or "turn off" in phrase:
-                        print("Attempting to shut down...")
-                        system.Window().shutdown()
-
-                    listen = False
+                computer(text)
                 break
         
 
-        VOLUME = ["change volume", "lower volume", "increase volume"]
+        VOLUME = ["change volume to", "change volume by", 
+                  "lower volume to", "lower volume by",
+                  "increase volume to", "increase volume by",
+                  "get volume", "mute", "unmute"]
         for phrase in VOLUME:
             if phrase in text:
-                pass
-                # Run system.audio.setVolume()
-                # speak("Changing volume")
-                # for word in text:
-                #     if word.isdigit():
-                #         print(f"Volume {word}")
-                #         set_master_volume(int(word))
-                #         break
-                # break
-
+                volume(text)
+                break
+'''
 
 
 # if __name__ == '__main__':

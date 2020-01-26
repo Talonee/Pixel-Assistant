@@ -30,13 +30,12 @@ class Audio():
         #        '4%': -44.61552047729492, '3%': -47.73759078979492, '2%': -51.671180725097656, '1%': -56.992191314697266, '0%': -65.25}
 
         devices = AudioUtilities.GetSpeakers()
-        interface = devices.Activate(
-            IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
+        interface = devices.Activate(IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
         self.volume = cast(interface, POINTER(IAudioEndpointVolume))
 
     def setVolume(self, pre="to", level="10"):
         # Remove % and set level to between 0 and 1
-        level = (int(level.replace("%", "")) if "%" in level else int(level)) / 100
+        level = int(level) / 100
 
         if pre == "by":
             level = self._getVolume() + level
@@ -47,6 +46,10 @@ class Audio():
         level = 1 if level > 1 else 0 if level < 0 else level 
 
         self.volume.SetMasterVolumeLevelScalar(level, None)
+
+    def toggleMute(self, status="mute"):
+        val = 1 if status == "mute" else 0
+        self.volume.SetMute(val, None)
 
     def getVolume(self):
         return f"{(self.volume.GetMasterVolumeLevelScalar() * 100):.0f}%"
@@ -61,7 +64,7 @@ class Screen():
     def setBrightness(self, pre="to", level="10"):
         # num = [i for i in list(text) if i.isdigit()]
         # brightness = int("".join(num))
-        level = (int(level.replace("%", "")) if "%" in level else int(level))
+        level = int(level)
         
         if pre == "by":
             level = self._getBrightness() + level
@@ -96,6 +99,8 @@ class Window():
 
 audio = Audio()
 # audio.setVolume(pre="by", level="-9%")
+# audio.toggleMute()
+# print(audio.muteVolume("on"))
 # print(audio.getVolume())
 
 screen = Screen()
