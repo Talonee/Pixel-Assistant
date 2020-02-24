@@ -17,7 +17,6 @@ import subprocess
 
 import json
 
-
 import system
 
 # If modifying these scopes, delete the file token.pickle.
@@ -26,14 +25,12 @@ MONTHS = ["january", "february", "march", "april", "may", "june","july", "august
 DAYS = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
 DAY_EXTENTIONS = ["rd", "th", "st", "nd"]
 
-
 def speak(text):
     engine = pyttsx3.init()
     engine.setProperty('voice', "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Speech\Voices\Tokens\TTS_MS_EN-US_ZIRA_11.0")
     engine.setProperty('rate', 175)
     engine.say(text)
     engine.runAndWait()
-
 
 def get_audio():
     # print("Ready to listen...")
@@ -52,30 +49,6 @@ def get_audio():
     print("Ready to listen...")
             
     return said.lower()
-
-
-# speak("Hello, what would you like me to do?")
-# get_audio()
-
-# text = get_audio()
-# if "hello" in text:
-#     speak("Hey wassup man?")
-
-# if "your name" in text:
-#     speak("My name is Pixel.")
-
-# if "hi to my" in text:
-#     target = text.split(" ")
-#     speak(f"Hello, Talon's {target[-1]}")
-
-
-
-
-# if __name__ == "__main__":
-#     with open("key.json") as f:
-#         key = json.load(f)
-#         print(key["ID"])
-
 
 
 def authenticate_google():
@@ -129,7 +102,6 @@ def get_events(day, service):
 
             speak(event["summary"] + " at " + start_time)
 
-
 def get_date(text):
     today = datetime.date.today()
 
@@ -179,27 +151,7 @@ def get_date(text):
 
     return datetime.date(month=month, day=day, year=year)
 
-# def set_master_volume(vol):
-#     pass
-
-# set_master_volume(40)
-
-def note(text):
-    date = datetime.datetime.now()
-    file_name = str(date).replace(":", "-") + "-note.txt"
-    with open(file_name, "w") as f:
-        f.write(text)
-
-    vsc = "C:/Users/Cakee/AppData/Local/Programs/Microsoft VS Code/Code.exe"
-    notepad = "C:/WINDOWS/system32/notepad.exe"
-    subprocess.Popen([notepad, file_name])
-
-
-
-
-
-
-
+# Change computer status (shutdown, sleep, restart)
 def computer(text):
     if "set to" in text:
         response = "y"
@@ -220,6 +172,7 @@ def computer(text):
 
         listen = False
 
+# Change computer volume
 def volume(text):
     if "get" in text:
         sys.tracebacklimit = -1
@@ -235,10 +188,6 @@ def volume(text):
             system.Audio().setVolume(pre="by",level=level)
         else:
             system.Audio().setVolume(pre="to",level=level)
-
-
-
-
 
 
 '''
